@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
-# nginx web server listening on port 80
-# returns a page that contains the string "Hello World!"
+# Commands to install Nginx on Web-Sever-01
 
-sudo apt update -y
-sudo apt install -y nginx
-echo 'Hello World!' > /var/www/html/index.nginx-debian.html
+# Updating Packages before making Installations
+sudo apt-get update
+sudo apt-get -y install nginx
+
+# Configuring the Uncomplicated Firewall (UFW) to allow incoming traffic for the Nginx HTTP service
+sudo ufw allow 'Nginx HTTP'
+
+# Creating an index.html page
+echo "Hello World!" | sudo tee /var/www/html/index.html
+
+# Testing Nginx configurations for Syntax errors
+sudo nginx -t
+
+# Restarting Nginx
 sudo service nginx start
