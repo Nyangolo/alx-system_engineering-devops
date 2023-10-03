@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 # Update package list and install Nginx
 sudo apt update
 sudo apt install -y nginx
@@ -31,4 +30,3 @@ rm /var/www/html/index.nginx-debian.html
 
 # Print a message
 echo "Nginx has been configured. You can access it by visiting http://your-server-ip/"
-
