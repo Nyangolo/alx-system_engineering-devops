@@ -1,57 +1,38 @@
 #!/usr/bin/env bash
-# Update package list and install Nginx
-#!/bin/bash
+# Configures a new ubuntu machine by installing
+# Nginx where it should be listening on port 80
+# Serve a page that would return a Hello World string
+#
+# colors
+blue='\e[1;34m'
+brown='\e[0;33m'
+green='\e[1;32m'
+reset='\033[0m'
 
-# Add the Nginx stable repository
-sudo add-apt-repository ppa:nginx/stable
+echo -e "${blue}Updating and installing ${brown}Nginx${blue}.${reset}\n"
+sudo apt-get update -y -qq && \
+	 sudo apt-get install nginx -y
 
-# Update the software packages list
-sudo apt-get update
+echo -e "\n${blue}Setting up some minor stuff.${reset}\n"
 
-# Install Nginx
-sudo apt-get install -y nginx
+# starting nginx service
+sudo service nginx start
 
-# Allow HTTP traffic through the firewall
+# allowing nginx on firewall
 sudo ufw allow 'Nginx HTTP'
 
-# Change folder permissions
+# Give the user ownership to website files for easy editing
+sudo chown -R "$USER":"$USER" /var/www/html
 sudo chmod -R 755 /var/www
 
-# Create an index.html file with "Hello World!"
-echo "Hello World!" | sudo tee /var/www/html/index.html
+# Backup default index
+cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
 
-# Create a custom 404.html page
-echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+# Creating new index
+echo -e "Hello World!" | dd status=none of=/var/www/html/index.nginx-debian.html
 
-# Configure the default Nginx server block
-sudo tee /etc/nginx/sites-enabled/default > /dev/null <<EOL
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    root /var/www/html;
-    index index.html index.htm index.nginx-debian.html;
-    server_name _;
-
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-
-    error_page 404 /404.html;
-    location = /404.html {
-        internal;
-    }
-
-    if (\$request_filename ~ redirect_me){
-        rewrite ^ https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;
-    }
-}
-EOL
-
-# Restart Nginx without using systemctl
+# Restarting nginx
 sudo service nginx restart
 
-# Ensure Nginx starts on boot
-sudo systemctl enable nginx
-
-echo "Nginx is installed and configured."
+echo -e "\n${green}Completed.${reset} ✅\n"
 
