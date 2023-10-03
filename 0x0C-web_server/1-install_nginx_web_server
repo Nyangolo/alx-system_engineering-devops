@@ -1,18 +1,7 @@
 #!/usr/bin/env bash
-# Commands to install Nginx on Web-Sever-01
-
-# Updating Packages before making Installations
-sudo apt-get update
-sudo apt-get -y install nginx
-
-# Configuring the Uncomplicated Firewall (UFW) to allow incoming traffic for the Nginx HTTP service
-sudo ufw allow 'Nginx HTTP'
-
-# Creating an index.html page
-echo "Hello World!" | sudo tee /var/www/html/index.html
-
-# Testing Nginx configurations for Syntax errors
-sudo nginx -t
-
-# Restarting Nginx
-sudo service nginx start
+# Install nginx and start it
+apt-get -y install nginx
+service nginx start
+ufw allow 'Nginx HTTP'
+echo "Holberton School\n" | sudo tee /var/www/html/index.nginx-debian.html
+service nginx restart
