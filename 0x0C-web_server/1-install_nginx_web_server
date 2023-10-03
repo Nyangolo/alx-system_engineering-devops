@@ -1,32 +1,57 @@
 #!/usr/bin/env bash
 # Update package list and install Nginx
-sudo apt update
-sudo apt install -y nginx
+#!/bin/bash
 
-# Create an HTML file with "Hello World!" content
-echo "<html><body><h1>Hello World!</h1></body></html>" | sudo tee /var/www/html/index.html
+# Add the Nginx stable repository
+sudo add-apt-repository ppa:nginx/stable
 
-# Configure Nginx to listen on port 80 and serve the HTML file
-sudo bash -c 'cat > /etc/nginx/sites-available/default' <<EOF
+# Update the software packages list
+sudo apt-get update
+
+# Install Nginx
+sudo apt-get install -y nginx
+
+# Allow HTTP traffic through the firewall
+sudo ufw allow 'Nginx HTTP'
+
+# Change folder permissions
+sudo chmod -R 755 /var/www
+
+# Create an index.html file with "Hello World!"
+echo "Hello World!" | sudo tee /var/www/html/index.html
+
+# Create a custom 404.html page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+
+# Configure the default Nginx server block
+sudo tee /etc/nginx/sites-enabled/default > /dev/null <<EOL
 server {
-    listen 80;
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
     server_name _;
 
     location / {
-        root /var/www/html;
-        index index.html;
+        try_files \$uri \$uri/ =404;
+    }
+
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
+    }
+
+    if (\$request_filename ~ redirect_me){
+        rewrite ^ https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;
     }
 }
-EOF
+EOL
 
-# Test Nginx configuration
-sudo nginx -t
+# Restart Nginx without using systemctl
+sudo service nginx restart
 
-# Restart Nginx
-sudo kill -s HUP $(cat /var/run/nginx.pid)
+# Ensure Nginx starts on boot
+sudo systemctl enable nginx
 
-# Clean up
-rm /var/www/html/index.nginx-debian.html
+echo "Nginx is installed and configured."
 
-# Print a message
-echo "Nginx has been configured. You can access it by visiting http://your-server-ip/"
