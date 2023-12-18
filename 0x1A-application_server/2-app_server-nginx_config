@@ -1,41 +1,23 @@
 server {
-        listen 80 default_server;
+    listen 80;
+    100.26.154.130; # Change this to your public IP or domain name
 
-        # 0x1A-application_server - 2-app_server-nginx_config
-        location = /airbnb-onepage/ {
-                 proxy_pass http://0.0.0.0:5000/airbnb-onepage/;
+    location /airbnb-onepage/ {
         proxy_pass http://127.0.0.1:5000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_buffering off;
+    }
+
+    location / {
+        # Additional configurations for other routes or static files if needed
+        # For example, you can serve static files from a directory:
+        # root /path/to/static/files;
+        # index index.html index.htm;
+    }
+
+    # Add additional server blocks or configurations as needed...
 }
 
-        # 404 Page:
-        error_page 404 /custom_404.html; location = /custom_404.html {
-        root /usr/share/nginx/html;
-        internal;
-        }
-
-        # Header:
-        add_header X-Served-By "331444-web-01";
-
-        # rewrite:
-        rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;
-
-        listen [::]:80 default_server;
-
-        root /var/www/html;
-
-        # Add index.php to the list if you are using PHP
-        index index.html index.htm index.nginx-debian.html;
-
-        server_name _;
-
-        location / {
-                # First attempt to serve request as file, then
-                # as directory, then fall back to displaying a 404.
-                try_files $uri $uri/ =404;
-        }
-}
